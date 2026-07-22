@@ -1,5 +1,7 @@
 import {Application} from "../models/application.js";
 import {Job} from "../models/job.js";
+
+//  apply for a job
 export const applyJob = async(req,res)=>{
  try{
     const userId = req.id;
@@ -31,7 +33,7 @@ return res.status(201).json({message: "Job applied successfully",success:true,ap
  }
 }
 
-
+// get all jobs applied by the logged-in user
 export const getAppliedJobs = async(req,res)=>{
     try{
         const userId = req.id;
