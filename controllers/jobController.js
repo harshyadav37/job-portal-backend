@@ -69,7 +69,7 @@ export const getJobById = async(req,res)=>{
 }
 
 
-// recruiter total jobs posted by him
+// recruiter total jobs posted by him hello dude
 export const getAdminJobs = async(req,res)=>{
     try{
         const adminId = req.id;
