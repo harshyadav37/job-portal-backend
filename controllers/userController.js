@@ -16,15 +16,23 @@ export const register =async(req,res)=>{
 
   const hashedPassword = await bcrypt.hash(password,10);
 
-  await User.create({
+  const profilePhoto = req.file ? req.file.buffer.toString('base64') : "";
+
+  const newUser = await User.create({
     fullName,
     email,  
     phoneNumber,
     password: hashedPassword,
     role,
+    profile: {
+      profilePhoto: profilePhoto,
+      skills: []
+    }
   });
-  res.status(201).json({message: "User registered successfully",success:true});
+
+  res.status(201).json({message: "User registered successfully",success:true, user: newUser});
     }catch(error){
+        console.log(error);
         res.status(500).json({message: "Error registering user",success:false});
     }
 }
