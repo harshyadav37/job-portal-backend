@@ -102,8 +102,8 @@ export const logout = async(req,res)=>{
 
 // cloudinary
 let skillsArray;
-     if(skills){
-       skillsArray = skills.split(",");
+     if(skills !== undefined){
+       skillsArray = skills ? skills.split(",").map((item)=>item.trim()).filter(Boolean) : [];
      }
 
      
