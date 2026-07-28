@@ -1,6 +1,8 @@
 import {User} from "../models/user.js";
 import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
+import getDataUri from "../utils/datauri.js";
+import cloudinary from "../utils/cloudinary.js";
 
 export const register =async(req,res)=>{
     try{
@@ -96,11 +98,15 @@ export const logout = async(req,res)=>{
     try{
         const {fullName,email,phoneNumber,bio,skills}=req.body;
         const file = req.file;
-    
-         
 
+        let cloudResponse = null;
+        if(file?.buffer){
+            const fileUri = getDataUri(file);
+            if(fileUri){
+                cloudResponse = await cloudinary.uploader.upload(fileUri.content);
+            }
+        }
 
-// cloudinary
 let skillsArray;
      if(skills !== undefined){
        skillsArray = skills ? skills.split(",").map((item)=>item.trim()).filter(Boolean) : [];
@@ -116,13 +122,18 @@ let skillsArray;
     //  updating data
 
 
-    if(fullName) user.fullName = fullName;
-    if(email) user.email = email;
-    if(phoneNumber) user.phoneNumber = phoneNumber;
-    if(bio) user.profile.bio = bio;
-    if(skillsArray) user.profile.skills = skillsArray;
+    if(fullName !== undefined) user.fullName = fullName;
+    if(email !== undefined) user.email = email;
+    if(phoneNumber !== undefined) user.phoneNumber = phoneNumber;
+    if(bio !== undefined) user.profile.bio = bio;
+    if(skillsArray !== undefined) user.profile.skills = skillsArray;
 
     //  resume
+
+    if(cloudResponse && file){
+        user.profile.resume= cloudResponse.secure_url
+        user.profile.resumeOriginalName=file.originalname
+    }
      await user.save();
 
 
@@ -138,7 +149,8 @@ let skillsArray;
         
     return res.status(200).json({message: "Profile updated successfully",success:true,user});
     }catch(error){
-        res.status(500).json({message: "Error updating profile",success:false});
+        console.error(error);
+        res.status(500).json({message: error.message || "Error updating profile",success:false});
     }
 
 
