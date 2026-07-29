@@ -10,6 +10,9 @@ export const register =async(req,res)=>{
      if(!fullName || !email || !phoneNumber || !password || !role){
         return res.status(400).json({message: "Please provide all required fields",success:false});
      } 
+     const file = req.file;
+     const fileUri =getDataUri(file);
+     const cloudResopne= await cloudinary.uploader.upload(fileUri.content)
 
      const user =await User.findOne({email});
      if(user){
@@ -27,7 +30,7 @@ export const register =async(req,res)=>{
     password: hashedPassword,
     role,
     profile: {
-      profilePhoto: profilePhoto,
+      profilePhoto:cloudResopne.secure_url ,
       skills: []
     }
   });
