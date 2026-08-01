@@ -2,6 +2,7 @@ import express from "express";
 import cookieParser from "cookie-parser";
 import cors from "cors";
 import dotenv from "dotenv";
+import path from "path";
 import connectDB from "./utils/db.js";
 import userRoute from "./routes/userRoute.js";
 import companyRoute from "./routes/companyRoute.js";
@@ -20,6 +21,7 @@ connectDB();
 app.use(cookieParser());
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
+app.use("/uploads", express.static(path.join(process.cwd(), "uploads")));
 const corsOptions = {
   origin: "http://localhost:5173",
   credentials: true,
