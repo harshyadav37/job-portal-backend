@@ -75,7 +75,7 @@ export const login = async(req,res)=>{
             role: user.role,
             profile: user.profile,   
         }
-         return res.status(200).cookie("token",token,{ maxAge: 7*24*60*60*1000,httpOnly:true ,sameSite:'strict'}).json({message: `Welcome back, ${user.fullName}!`,success:true,user});
+         return res.status(200).cookie("token",token,{ maxAge: 7*24*60*60*1000,httpOnly:true,sameSite:'none',secure: process.env.NODE_ENV === 'production' }).json({message: `Welcome back, ${user.fullName}!`,success:true,user});
         
     }catch(error){
      return   res.status(500).json({message: "Error logging in",success:false});

@@ -5,9 +5,18 @@ export const postJob = async(req,res)=>{
     try{
         const {title,description,requirements,salary,location,jobType,position,companyId ,experience}=req.body;
         const userId = req.id;
-        if(!title || !description || !requirements || !salary || !location || !jobType || !position  || !companyId || !experience){
+        if(!title || !description || !requirements || salary === undefined || !location || !jobType || position === undefined || !companyId || experience === undefined){
             return res.status(400).json({message: "Please provide all required fields",success:false});
         }
+
+        const parsedSalary = Number(salary);
+        const parsedExperience = Number(experience);
+        const parsedPosition = Number(position);
+
+        if(Number.isNaN(parsedSalary) || Number.isNaN(parsedExperience) || Number.isNaN(parsedPosition)){
+            return res.status(400).json({message: "Salary, experience and position must be valid numbers",success:false});
+        }
+
         const parsedRequirements = Array.isArray(requirements)
             ? requirements.map(r => String(r).trim())
             : (typeof requirements === "string" ? requirements.split(",").map(r => r.trim()) : []);
@@ -16,12 +25,12 @@ export const postJob = async(req,res)=>{
             title,
             description,
             requirements: parsedRequirements,
-            salary: Number(salary),
+            salary: parsedSalary,
             location,
             jobType,
-            position,
+            position: parsedPosition,
             company: companyId,
-            experienceLevel: Number(experience),
+            experienceLevel: parsedExperience,
             created_by: userId
         });
         return res.status(201).json({message: "Job posted successfully",success:true,job});
@@ -77,8 +86,11 @@ export const getAdminJobs = async(req,res)=>{
     try{
         const adminId = req.id;
 
-        const jobs = await Job.find({created_by: adminId});
-        if(!jobs){
+        const jobs = await Job.find({ created_by: adminId })
+            .populate({ path: "company", select: "name" })
+            .sort({ createdAt: -1 });
+
+        if(!jobs || jobs.length === 0){
             return res.status(404).json({message: "No jobs found",success:false});
         }
         return res.status(200).json({message: "Jobs found",success:true,jobs});
