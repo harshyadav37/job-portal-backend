@@ -174,7 +174,7 @@ export const login = async (req, res) => {
 };
 
 
-
+//    logut api
 
 export const logout = async(req,res)=>{
     try{
